@@ -21,10 +21,8 @@
 #include "Shader.h"
 #include "Texture.h"
 
-typedef struct tile{
-    char*m_buffer = nullptr;
-    size_t m_size = 0;
-}Tile;
+const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/"};
+const std::string tilesTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjVqZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
 
 class Application {
 public:

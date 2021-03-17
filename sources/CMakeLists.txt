@@ -22,7 +22,7 @@ set(RENDER_API_SRC
         Texture.cpp Texture.h)
 set(APPLICATION_SRC
         Application.cpp Application.h
-        main.cpp)
+        main.cpp Tile.cpp Tile.h)
 add_executable(${CMAKE_PROJECT_NAME} ${APPLICATION_SRC} ${RENDER_API_SRC})
 
 target_link_libraries(${CMAKE_PROJECT_NAME}

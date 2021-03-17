@@ -7,7 +7,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-
+#include "Tile.h"
 void Application::initWindow()
 {
     if (!glfwInit())
@@ -100,19 +100,11 @@ void Application::startWindowLoop()
     Shader shaderProgram(R"(../../res/shaders/Base.shader)");
     shaderProgram.bind();
 
-    std::ofstream os("tile.png",std::ios_base::trunc | std::ios_base::binary);
-    curlpp::Easy request;
-
-    request.setOpt(new curlpp::options::WriteStream(&os));
-    request.setOpt(new curlpp::options::Url("https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/3/1/1?"
-                                            "access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXFhYTA2bTMyeW44ZG0ybXBkMHkifQ.gUGbDOPUN1v1fTs5SeOR4A"));
-    request.setOpt(new curlpp::options::SslVerifyPeer(false));
-
-    request.perform();
-    os.close();
+    Tile tile;
+    tile.dwnloadFromWeb(tilesWebUrl + "1/1/1" + tilesTokenUrl);
 
     Texture currentTexture;
-    currentTexture.loadTexture(R"(D:\Programing\Clion_work\SoftServeTasks\custom_map\cmake-build-debug\sources\tile.png)");
+    currentTexture.loadTexture(tile.getPathToFile());
     currentTexture.bind();
     shaderProgram.setUniform1i("u_texture", 0);
 
@@ -184,7 +176,7 @@ void* Realloc(void* ptr, size_t size)
         return malloc(size);
 }
 
-size_t Application::WriteMemoryCallback(char *ptr, size_t size, size_t nmemb)
+/*size_t Application::WriteMemoryCallback(char *ptr, size_t size, size_t nmemb)
 {
     Tile tile;
     // Calculate the real size of the incoming buffer
@@ -206,4 +198,4 @@ size_t Application::WriteMemoryCallback(char *ptr, size_t size, size_t nmemb)
     os.close();
     // return the real size of th.e buffer..
     return realsize;
-}
+}*/
