@@ -13,8 +13,8 @@
 #include <cmath>
 #define COORD_COEFICIENT(v) pow(2,(v))
 constexpr void type(ScreenPosition pos){
-    switch(pos){
-
+    switch(pos)
+    {
         case TOP_LEFT:
             std::cout << "TOP_LEFT";
             break;
@@ -30,7 +30,6 @@ constexpr void type(ScreenPosition pos){
     }
 }
 int Tile::s_tileCounter = 0;
-std::chrono::time_point<std::chrono::system_clock> start;
 
 Tile::Tile(const std::string& path, Coordinates coords, const std::string& token):
             m_position{coords}
@@ -38,19 +37,16 @@ Tile::Tile(const std::string& path, Coordinates coords, const std::string& token
     dwnloadFromWeb(path,coords, token);
 }
 
-Tile::Tile():
-m_webPath(""), m_position{0}
+Tile::Tile(ScreenPosition scPosition)
 {
-
+    specRenderAttribs(scPosition);
 }
-Tile::Tile(const Tile&)
-{
 
-}
-Tile::~Tile()
-{
+Tile::Tile():m_webPath(""), m_position{0}{}
 
-}
+Tile::Tile(const Tile&){}
+
+Tile::~Tile(){}
 
 void Tile::dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token)
 {
@@ -115,9 +111,9 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
     {
         case ScreenPosition::TOP_LEFT:
             m_vertices = {
-                    -1.0f, 0.0f,  0.0f, 0.5f,
-                     0.0f, 0.0f,  0.5f, 0.5f,
-                     0.0f, 1.0f,  0.5f, 1.0f,
+                    -1.0f, 0.0f,  0.0f, 0.0f,
+                     0.0f, 0.0f,  1.0f, 0.0f,
+                     0.0f, 1.0f,  1.0f, 1.0f,
                     -1.0f, 1.0f,  0.0f, 1.0f
 
             };
@@ -125,10 +121,10 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
             break;
         case ScreenPosition::TOP_RIGHT:
             m_vertices = {
-                    0.0f, 0.0f,  0.5f, 0.5f,
-                    1.0f, 0.0f,  1.0f, 0.5f,
+                    0.0f, 0.0f,  0.0f, 0.0f,
+                    1.0f, 0.0f,  1.0f, 0.0f,
                     1.0f, 1.0f,  1.0f, 1.0f,
-                    0.0f, 1.0f,  0.5f, 1.0f
+                    0.0f, 1.0f,  0.0f, 1.0f
 
             };
             dwnloadFromWeb(tilesWebUrl,{1,1,0},tilesWebTokenUrl);
@@ -136,18 +132,18 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
         case ScreenPosition::BOTTOM_LEFT:
             m_vertices = {
                     -1.0f, -1.0f,  0.0f, 0.0f,
-                     0.0f, -1.0f,  0.5f, 0.0f,
-                     0.0f,  0.0f,  0.5f, 0.5f,
-                    -1.0f,  0.0f,  0.0f, 0.5f
+                     0.0f, -1.0f,  1.0f, 0.0f,
+                     0.0f,  0.0f,  1.0f, 1.0f,
+                    -1.0f,  0.0f,  0.0f, 1.0f
             };
             dwnloadFromWeb(tilesWebUrl,{1,0,1},tilesWebTokenUrl);
             break;
         case ScreenPosition::BOTTOM_RIGHT:
             m_vertices = {
-                    0.0f, -1.0f,  0.5f, 0.0f,
+                    0.0f, -1.0f,  0.0f, 0.0f,
                     1.0f, -1.0f,  1.0f, 0.0f,
-                    1.0f,  0.0f,  1.0f, 0.5f,
-                    0.0f,  0.0f,  0.5f, 0.5f
+                    1.0f,  0.0f,  1.0f, 1.0f,
+                    0.0f,  0.0f,  0.0f, 1.0f
             };
             dwnloadFromWeb(tilesWebUrl,{1,1,1},tilesWebTokenUrl);
             break;
@@ -176,7 +172,7 @@ void Tile::addVerticesToGPU()
     VertexBufferLayout layout;
     layout.push(GL_FLOAT,2);
     layout.push(GL_FLOAT,2);
-    m_VAO->addBuffer(*m_VBO,layout);
+    m_VAO->addBuffer(*m_VBO, layout);
     m_IB = std::make_unique<IndexBuffer>(m_indices.data(), m_indices.size());
 
     m_shader.initialise(R"(../../res/shaders/Base.shader)");
@@ -195,26 +191,17 @@ void Tile::loadTileTexture(const std::string& path)
         m_texture.loadTexture(path);
      }
     m_texture.bind();
+    m_shader.bind();
     m_shader.setUniform1i("u_texture",0);
-}
-
-Tile::Tile(ScreenPosition scPosition)
-{
-    specRenderAttribs(scPosition);
 }
 
 void Tile::bindToDraw()
 {
-    unbindFromDraw();
-    m_shader.bind();
-    m_texture.bind();
-    m_VBO->bind();
-    m_VAO->bind();
-    m_IB->bind();
+
 }
 void Tile::draw()
 {
-    GLCall(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr));
+    m_renderer.draw(*m_VAO,*m_IB,m_shader);
 }
 Tile::Coordinates Tile::getPositions() {
     return m_position;
@@ -232,7 +219,7 @@ void Tile::unbindFromDraw()
     m_VBO->unbind();
     m_VAO->unbind();
     m_IB->unbind();
-    m_texture.unbind();
+    m_shader.unbind();
 }
 
 

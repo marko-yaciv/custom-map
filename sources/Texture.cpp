@@ -3,7 +3,7 @@
 //
 
 #include "Texture.h"
-#include "vendor/stb_image.h"
+#include "utils/stb_image.h"
 
 
 Texture::Texture():

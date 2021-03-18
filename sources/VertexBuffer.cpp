@@ -3,7 +3,7 @@
 //
 
 #include "VertexBuffer.h"
-#include "Renderer.h"
+#include "utils/pch.h"
 
 VertexBuffer::VertexBuffer(const void *data, unsigned int size)
 {

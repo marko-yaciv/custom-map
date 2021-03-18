@@ -4,8 +4,8 @@
 
 #ifndef CUSTOM_MAP_SHADERPARSER_H
 #define CUSTOM_MAP_SHADER_H
-
 #include <iostream>
+
 struct ShadersSources{
     std::string vertexSource;
     std::string fragmentSource;

@@ -8,11 +8,9 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "VertexArray.h"
 #include "Renderer.h"
 #include "Texture.h"
-#include "Shader.h"
-#include "IndexBuffer.h"
+
 
 const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512"};
 const std::string tilesWebTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjVqZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
@@ -72,6 +70,7 @@ private:
 
     Texture m_texture;
     Shader m_shader;
+    Renderer m_renderer;
     std::unique_ptr<VertexArray> m_VAO;
     std::unique_ptr<VertexBuffer> m_VBO;
     std::unique_ptr<IndexBuffer> m_IB;

@@ -5,14 +5,16 @@
 #ifndef CUSTOM_MAP_RENDERER_H
 #define CUSTOM_MAP_RENDERER_H
 
-#include <GL/glew.h>
+#include "utils/pch.h"
+#include "VertexArray.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
 
-#define ASSERT(expr) if(!(expr)) __debugbreak();
-#define GLCall(glFunc) GLClearError();\
-    glFunc;\
-    ASSERT(GLLogCall(#glFunc, __FILE__, __LINE__))
 
-void GLClearError();
-bool GLLogCall(const char* funcName, const char* file, int line);
+class Renderer{
+public:
+    void draw(const VertexArray& vao, const IndexBuffer& ib, Shader& shader) const ;
 
+    static void clear();
+};
 #endif //CUSTOM_MAP_RENDERER_H

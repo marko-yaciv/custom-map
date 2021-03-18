@@ -18,9 +18,9 @@ set(RENDER_API_SRC
         Shader.cpp Shader.h
         VertexArray.cpp VertexArray.h
         VertexBufferLayout.cpp VertexBufferLayout.h
-        vendor/stb_image.h vendor/stb_image.cpp
+        utils/stb_image.h utils/stb_image.cpp
         Texture.cpp Texture.h
-        )
+        utils/pch.h)
 set(APPLICATION_SRC
         Application.cpp Application.h
         main.cpp Tile.cpp Tile.h)

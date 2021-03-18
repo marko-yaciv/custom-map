@@ -4,10 +4,9 @@
 
 #include <cstdarg>
 #include <fstream>
-#include <cmath>
-#include "Application.h"
-#include "Renderer.h"
 
+#include "Application.h"
+#include <thread>
 std::vector<Tile> Application::map_level(4);
 
 Application::Application()
@@ -91,29 +90,72 @@ void Application::startWindowLoop()
     map_level[ScreenPosition::BOTTOM_LEFT].specRenderAttribs(ScreenPosition::BOTTOM_LEFT);
     map_level[ScreenPosition::BOTTOM_RIGHT].specRenderAttribs(ScreenPosition::BOTTOM_RIGHT);
 
-    for(auto& tile: map_level)
-    {
+    /*std::vector<GLfloat> vertices = {
+            -1.0f, 0.0f,  0.0f, 0.0f,
+             0.0f, 0.0f,  1.0f, 0.0f,
+             0.0f, 1.0f,  1.0f, 1.0f,
+            -1.0f, 1.0f,  0.0f, 1.0f
+    };
+    std::vector<unsigned int> indices = {
+            0, 1, 2,
+            2, 3, 0
+    };
 
+    //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+    VertexArray vao;
+    VertexBuffer vbo;
+    vbo.setData(vertices.data(),vertices.size() * sizeof(GLfloat));
+
+    VertexBufferLayout layout;
+    layout.push(GL_FLOAT,2);
+    layout.push(GL_FLOAT,2);
+
+    vao.addBuffer(vbo,layout);
+
+    IndexBuffer ib(indices.data(), indices.size());
+
+    Shader shader(R"(../../res/shaders/Base.shader)");
+    shader.bind();
+
+    Texture txt;
+    txt.loadTexture(R"(../../res/textures/tree.png)");
+    txt.bind();
+
+    shader.setUniform1i("u_texture",0);
+
+    vao.unbind();
+    vbo.unbind();
+    ib.unbind();
+    shader.unbind();
+
+    Renderer renderer;*/
+    for(auto&tile : map_level)
+    {
+        tile.unbindFromDraw();
     }
 
     while(!glfwWindowShouldClose(window))
     {
         configurePaintingSize();
         glfwPollEvents();
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+        Renderer::clear();
+
         for(auto&tile : map_level)
         {
-            tile.unbindFromDraw();
-        }
-        for(auto&tile : map_level)
-        {
-            tile.bindToDraw();
             tile.loadTileTexture();
             tile.draw();
         }
 
+        /*shader.bind();
+        shader.setUniform1i("u_texture",0);
+        renderer.draw(vao,ib,shader);*/
+
         glfwSwapBuffers(window);
     }
+    glfwTerminate();
+
 }
 
 void Application::setKeysCallbacks()
@@ -125,6 +167,7 @@ void Application::key_pressed(GLFWwindow *window, int key, int scancode, int act
 {
 
     if(action == GLFW_PRESS)
+    {
         switch (key)
         {
             case GLFW_KEY_KP_ADD:
@@ -148,12 +191,14 @@ void Application::key_pressed(GLFWwindow *window, int key, int scancode, int act
             default:
                 break;
         }
+    }
 }
 
 void Application::zoomIn()
 {
     std::cout << std::endl;
     for(auto&tile : map_level){
+
         tile.unbindFromDraw();
         ++tile;
         tile.loadTileTexture();
@@ -182,6 +227,7 @@ void Application::moveUp()
     map_level[ScreenPosition::BOTTOM_RIGHT].replace(map_level[ScreenPosition::TOP_RIGHT]);
 
     for(auto&tile : map_level){
+
         tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
                 tile.getScreenPosition() == ScreenPosition::TOP_RIGHT)

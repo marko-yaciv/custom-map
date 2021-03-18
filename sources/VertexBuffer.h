@@ -5,6 +5,7 @@
 #ifndef CUSTOM_MAP_VERTEXBUFFER_H
 #define CUSTOM_MAP_VERTEXBUFFER_H
 
+
 class VertexBuffer{
 public:
     VertexBuffer();
@@ -17,6 +18,5 @@ public:
 private:
     unsigned int m_redererID;
 };
-
 
 #endif //CUSTOM_MAP_VERTEXBUFFER_H

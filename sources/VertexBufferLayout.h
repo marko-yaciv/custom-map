@@ -5,7 +5,7 @@
 #ifndef CUSTOM_MAP_VERTEXBUFFERLAYOUT_H
 #define CUSTOM_MAP_VERTEXBUFFERLAYOUT__H
 
-#include <GL/glew.h>
+#include "utils/pch.h"
 #include <vector>
 
 struct VertexBufferElement{
@@ -24,7 +24,6 @@ struct VertexBufferElement{
             default:
                 return 0;
         }
-        return 0;
     }
 };
 

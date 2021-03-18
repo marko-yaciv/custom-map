@@ -6,7 +6,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "Renderer.h"
+
+#include "utils/pch.h"
 
 enum class ShaderType{
     NONE = -1, VERTEX = 0, FRAGMENT = 1
