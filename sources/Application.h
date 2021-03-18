@@ -16,13 +16,10 @@
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
-
-#include "VertexArray.h"
-#include "Shader.h"
-#include "Texture.h"
-
-const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/"};
+#include "Tile.h"
+const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/"};
 const std::string tilesTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjVqZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
+const int SIZE_OF_PICTURE = 512;
 
 class Application {
 public:
@@ -36,13 +33,20 @@ private:
     void configurePaintingSize();
     void startWindowLoop();
 
-    static size_t WriteMemoryCallback(char* ptr, size_t size, size_t nmemb);
+    static void zoomIn();
+    static void zoomOut();
+    static void moveUp();
+    static void moveDown();
+    static void moveLeft();
+    static void moveRight();
+
     //button events
     void setKeysCallbacks();
 
     static void key_pressed(GLFWwindow* window, int key, int scancode, int action, int mods);
 private:
     GLFWwindow * window;
+    static std::vector<Tile> map_level;
 };
 
 

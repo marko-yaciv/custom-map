@@ -3,34 +3,48 @@
 //
 
 #include "Tile.h"
-#include "IndexBuffer.h"
 
+#include <chrono>
+#include <random>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <fstream>
 
 int Tile::s_tileCounter = 0;
+std::chrono::time_point<std::chrono::system_clock> start;
 
-Tile::Tile(const std::string &path):
-    m_webPath(path), position{0}
+Tile::Tile(const std::string& path, int zoom, int x, int y, const std::string& token):
+            m_position{zoom,x,y}
 {
-    load(path);
+    dwnloadFromWeb(path,m_position.m_zoom,
+            m_position.m_x,
+            m_position.m_y, token);
 }
 
 Tile::Tile():
-m_webPath(""), position{0}
+m_webPath(""), m_position{0}
 {
 
 }
+Tile::Tile(const Tile&)
+{
 
+}
 Tile::~Tile()
 {
 
 }
 
-void Tile::dwnloadFromWeb(const std::string &path)
+void Tile::dwnloadFromWeb(const std::string& path, int zoom, int x, int y, const std::string& token)
 {
+    std:: cout << "Z:" << zoom << " X:" << x << " Y:" << y << std::endl;
+    m_position = {zoom, x, y};
+    std::string spos =  "/" + std::to_string(zoom) + "/" +
+                        std::to_string(x) + "/" +
+                        std::to_string(y);
+    m_webPath = path + spos + token;
+
     curlpp::Easy request;
     std::ofstream os;
     std::string filepath = getFilename();
@@ -41,7 +55,7 @@ void Tile::dwnloadFromWeb(const std::string &path)
         return;
     }
     request.setOpt(new curlpp::options::WriteStream(&os));
-    request.setOpt(new curlpp::options::Url(path));
+    request.setOpt(new curlpp::options::Url(m_webPath));
     request.setOpt(new curlpp::options::SslVerifyPeer(false));
     request.perform();
     os.close();
@@ -53,11 +67,12 @@ void createFileNameSpecificator(std::string& file_specificator)
     time(&curent_time);
     tm current_date;
     localtime_s(&current_date, &curent_time);
-
     /*converting date to string*/
     char str[50];
     strftime(str, 50, "%Y-%m-%d_%H-%M-%S", &current_date);
     file_specificator = str;
+    long long num = rand()%9999999999;
+    file_specificator += std::to_string(num);
 }
 
 std::string Tile::getFilename()
@@ -77,6 +92,7 @@ std::string Tile::getPathToFile()
 
 void Tile::specRenderAttribs(ScreenPosition scPosition)
 {
+    screenPos = scPosition;
     switch (scPosition)
     {
         case ScreenPosition::TOP_LEFT:
@@ -131,24 +147,74 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
 
 void Tile::addVerticesToGPU()
 {
-    VertexArray VAO;
-    VertexBuffer VBO;
-    VBO.setData(m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
+    m_VAO = std::make_unique<VertexArray>();
+    m_VBO = std::make_unique<VertexBuffer>();
+    m_VBO->setData(m_vertices.data(), m_vertices.size() * sizeof(GLfloat));
 
     VertexBufferLayout layout;
     layout.push(GL_FLOAT,2);
     layout.push(GL_FLOAT,2);
-    VAO.addBuffer(VBO,layout);
-    IndexBuffer ib(m_indices.data(), m_indices.size());
+    m_VAO->addBuffer(*m_VBO,layout);
+    m_IB = std::make_unique<IndexBuffer>(m_indices.data(), m_indices.size());
 
-    m_shader.parseFile(R"(../../res/shaders/Base.shader)");
+    m_shader.initialise(R"(../../res/shaders/Base.shader)");
     m_shader.bind();
 }
 
-void Tile::uploadToScreen()
+void Tile::loadTileTexture(const std::string& path)
 {
-    m_texture.loadTexture(m_filePath);
+    if(path.empty())
+    {
+        m_texture.loadTexture(m_filePath);
+    }
+    else
+     {
+         m_texture.loadTexture(path);
+     }
     m_texture.bind();
     m_shader.setUniform1i("u_texture",0);
+}
+
+Tile::Tile(ScreenPosition scPosition)
+{
+    specRenderAttribs(scPosition);
+}
+
+void Tile::bindToDraw()
+{
+    m_shader.bind();
+    m_VAO->bind();
+    m_IB->bind();
+}
+void Tile::draw()
+{
+    GLCall(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr));
+}
+Tile::Coordinates Tile::getPositions() {
+    return m_position;
+}
+
+void Tile::replace(const Tile& other)
+{
+    unbindFromDraw();
+    this->m_vertices = other.m_vertices;
+    this->m_indices = other.m_indices;
+    this->m_shader = other.m_shader;
+    this->m_texture = other.m_texture;
+    this->m_filePath = other.m_filePath;
+    this->m_webPath = other.m_webPath;
+    this->m_position = other.m_position;
+    this->m_VBO.release();
+    this->m_VAO.release();
+    this->m_IB.release();
+
+    specRenderAttribs(screenPos);
+}
+
+void Tile::unbindFromDraw()
+{
+    m_VAO->unbind();
+    m_IB->unbind();
+    m_shader.unbind();
 }
 

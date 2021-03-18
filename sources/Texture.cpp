@@ -45,7 +45,6 @@ void Texture::do_loadTexture()
     stbi_set_flip_vertically_on_load(1);
     m_localBuffer = stbi_load(m_filePath.c_str(), &m_width, &m_height, &m_BPP, 4);
 
-
     GLCall(glGenTextures(1,&m_rendererID));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));
 
@@ -55,7 +54,7 @@ void Texture::do_loadTexture()
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_localBuffer));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_localBuffer));
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 
     if(m_localBuffer)

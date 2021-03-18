@@ -43,9 +43,26 @@ ShadersSources Shader::parseFile(const std::string &filename)
 Shader::Shader(const std::string &filePath)
             :m_filePath(filePath), m_rendererID(0)
 {
+    initialise(filePath);
+}
+
+Shader::Shader():
+        m_filePath(""), m_rendererID(0)
+{
+
+}
+
+void Shader::initialise(const std::string &filePath)
+{
+    if(m_rendererID != 0)
+    {
+        return;
+    }
+    m_filePath = filePath;
     ShadersSources programSources = parseFile(m_filePath);
     m_rendererID = createShader(programSources.vertexSource,programSources.fragmentSource);
 }
+
 Shader::~Shader()
 {
     GLCall(glDeleteProgram(m_rendererID));
@@ -106,3 +123,4 @@ void Shader::setUniform1i(const std::string &name, int value)
 {
     GLCall(glUniform1i(getUniformLocation(name), value));
 }
+

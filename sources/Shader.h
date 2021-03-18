@@ -9,16 +9,18 @@
 struct ShadersSources{
     std::string vertexSource;
     std::string fragmentSource;
-
 };
 
 class Shader {
 public:
     Shader(const std::string& filePath);
+    Shader();
     ~Shader();
     void bind() const;
     void unbind() const;
 
+
+    void initialise(const std::string& filePath);
     ShadersSources parseFile(const std::string &filename);
     void setUniform4f(const std::string& name, float v0,float v1, float v2, float v3);
     void setUniform1i(const std::string& name, int value);
