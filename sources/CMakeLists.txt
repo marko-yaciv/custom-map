@@ -6,8 +6,8 @@ include_directories(${PROJECT_SOURCE_DIR}/includes/glew/include)
 include_directories(${PROJECT_SOURCE_DIR}/includes/libcurlpp/include)
 include_directories(${PROJECT_SOURCE_DIR}/includes/libcurl/include)
 
-link_directories(../includes/glfw/lib-own-compile)
-link_directories(../includes/glew/lib/Release/x64)
+link_directories(../includes/glfw/bin)
+link_directories(../includes/glew/bin)
 link_directories(../includes/libcurl/bin)
 link_directories(../includes/libcurlpp/bin)
 
@@ -19,7 +19,8 @@ set(RENDER_API_SRC
         VertexArray.cpp VertexArray.h
         VertexBufferLayout.cpp VertexBufferLayout.h
         vendor/stb_image.h vendor/stb_image.cpp
-        Texture.cpp Texture.h)
+        Texture.cpp Texture.h
+        )
 set(APPLICATION_SRC
         Application.cpp Application.h
         main.cpp Tile.cpp Tile.h)
@@ -34,8 +35,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
 
 set(THIRD_PARTY_LIBS
-        ${PROJECT_SOURCE_DIR}/includes/glew/bin/Release/x64/glew32.dll
-        ${PROJECT_SOURCE_DIR}/includes/glfw/lib-own-compile/glfw3.dll
+        ${PROJECT_SOURCE_DIR}/includes/glew/bin/glew32.dll
+        ${PROJECT_SOURCE_DIR}/includes/glfw/bin/glfw3.dll
         ${PROJECT_SOURCE_DIR}/includes/libcurl/bin/libcurl.dll
         ${PROJECT_SOURCE_DIR}/includes/libcurlpp/bin/libcurlpp.dll
         )
