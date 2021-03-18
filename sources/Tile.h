@@ -13,6 +13,10 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "IndexBuffer.h"
+
+const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512"};
+const std::string tilesWebTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjVqZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
+
 enum ScreenPosition{
     TOP_LEFT = 0, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT
 };
@@ -25,24 +29,35 @@ class Tile {
         int m_y;
     }Coordinates;
 public:
-    Tile(const std::string& path, int zoom, int x, int y, const std::string& token);
+    Tile(const std::string& path, Coordinates coords, const std::string& token);
     Tile();
     Tile(const Tile&);
     Tile(ScreenPosition scPosition);
     ~Tile();
 
+    inline ScreenPosition getScreenPosition(){ return m_screenPos;};
     Coordinates getPositions();
     std::string getPathToFile();
 
     void specRenderAttribs(ScreenPosition scPosition);
-    void dwnloadFromWeb(const std::string& path, int zoom, int x, int y, const std::string& token);
+    void dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token);
     void loadTileTexture(const std::string& path = "");
 
     void draw();
     void bindToDraw();
     void replace(const Tile& other);
-private:
+
+    void moveUp();
+    void moveDown();
+    void moveLeft();
+    void moveRight();
+    void operator++();
+    void operator--();
+
+    void showInfo();
     void unbindFromDraw();
+
+private:
     std::string getFilename();
     void addVerticesToGPU();
 private:
@@ -50,7 +65,7 @@ private:
     std::string m_filePath;
 
     Coordinates m_position;
-    ScreenPosition screenPos;
+    ScreenPosition m_screenPos;
 
     std::vector<GLfloat> m_vertices;
     std::vector<GLuint> m_indices;

@@ -10,16 +10,32 @@
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <fstream>
+#include <cmath>
+#define COORD_COEFICIENT(v) pow(2,(v))
+constexpr void type(ScreenPosition pos){
+    switch(pos){
 
+        case TOP_LEFT:
+            std::cout << "TOP_LEFT";
+            break;
+        case TOP_RIGHT:
+            std::cout << "TOP_RIGHT";
+            break;
+        case BOTTOM_RIGHT:
+            std::cout << "BOTTOM_RIGHT";
+            break;
+        case BOTTOM_LEFT:
+            std::cout << "BOTTOM_LEFT";
+            break;
+    }
+}
 int Tile::s_tileCounter = 0;
 std::chrono::time_point<std::chrono::system_clock> start;
 
-Tile::Tile(const std::string& path, int zoom, int x, int y, const std::string& token):
-            m_position{zoom,x,y}
+Tile::Tile(const std::string& path, Coordinates coords, const std::string& token):
+            m_position{coords}
 {
-    dwnloadFromWeb(path,m_position.m_zoom,
-            m_position.m_x,
-            m_position.m_y, token);
+    dwnloadFromWeb(path,coords, token);
 }
 
 Tile::Tile():
@@ -36,13 +52,12 @@ Tile::~Tile()
 
 }
 
-void Tile::dwnloadFromWeb(const std::string& path, int zoom, int x, int y, const std::string& token)
+void Tile::dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token)
 {
-    std:: cout << "Z:" << zoom << " X:" << x << " Y:" << y << std::endl;
-    m_position = {zoom, x, y};
-    std::string spos =  "/" + std::to_string(zoom) + "/" +
-                        std::to_string(x) + "/" +
-                        std::to_string(y);
+    m_position = {coords.m_zoom, coords.m_x, coords.m_y};
+    std::string spos =  "/" + std::to_string(coords.m_zoom) + "/" +
+                        std::to_string(coords.m_x) + "/" +
+                        std::to_string(coords.m_y);
     m_webPath = path + spos + token;
 
     curlpp::Easy request;
@@ -71,6 +86,9 @@ void createFileNameSpecificator(std::string& file_specificator)
     char str[50];
     strftime(str, 50, "%Y-%m-%d_%H-%M-%S", &current_date);
     file_specificator = str;
+
+    //Just a big random number, because tiles
+    // create very quickly and file always rewrites
     long long num = rand()%9999999999;
     file_specificator += std::to_string(num);
 }
@@ -92,7 +110,7 @@ std::string Tile::getPathToFile()
 
 void Tile::specRenderAttribs(ScreenPosition scPosition)
 {
-    screenPos = scPosition;
+    m_screenPos = scPosition;
     switch (scPosition)
     {
         case ScreenPosition::TOP_LEFT:
@@ -103,6 +121,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     -1.0f, 1.0f,  0.0f, 1.0f
 
             };
+            dwnloadFromWeb(tilesWebUrl,{1,0,0},tilesWebTokenUrl);
             break;
         case ScreenPosition::TOP_RIGHT:
             m_vertices = {
@@ -112,6 +131,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     0.0f, 1.0f,  0.5f, 1.0f
 
             };
+            dwnloadFromWeb(tilesWebUrl,{1,1,0},tilesWebTokenUrl);
             break;
         case ScreenPosition::BOTTOM_LEFT:
             m_vertices = {
@@ -120,6 +140,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                      0.0f,  0.0f,  0.5f, 0.5f,
                     -1.0f,  0.0f,  0.0f, 0.5f
             };
+            dwnloadFromWeb(tilesWebUrl,{1,0,1},tilesWebTokenUrl);
             break;
         case ScreenPosition::BOTTOM_RIGHT:
             m_vertices = {
@@ -128,6 +149,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     1.0f,  0.0f,  1.0f, 0.5f,
                     0.0f,  0.0f,  0.5f, 0.5f
             };
+            dwnloadFromWeb(tilesWebUrl,{1,1,1},tilesWebTokenUrl);
             break;
         default:
             m_vertices = {
@@ -169,7 +191,8 @@ void Tile::loadTileTexture(const std::string& path)
     }
     else
      {
-         m_texture.loadTexture(path);
+        m_filePath = path;
+        m_texture.loadTexture(path);
      }
     m_texture.bind();
     m_shader.setUniform1i("u_texture",0);
@@ -182,7 +205,10 @@ Tile::Tile(ScreenPosition scPosition)
 
 void Tile::bindToDraw()
 {
+    unbindFromDraw();
     m_shader.bind();
+    m_texture.bind();
+    m_VBO->bind();
     m_VAO->bind();
     m_IB->bind();
 }
@@ -196,25 +222,92 @@ Tile::Coordinates Tile::getPositions() {
 
 void Tile::replace(const Tile& other)
 {
-    unbindFromDraw();
-    this->m_vertices = other.m_vertices;
-    this->m_indices = other.m_indices;
-    this->m_shader = other.m_shader;
-    this->m_texture = other.m_texture;
-    this->m_filePath = other.m_filePath;
+    loadTileTexture(other.m_filePath);
     this->m_webPath = other.m_webPath;
     this->m_position = other.m_position;
-    this->m_VBO.release();
-    this->m_VAO.release();
-    this->m_IB.release();
-
-    specRenderAttribs(screenPos);
 }
 
 void Tile::unbindFromDraw()
 {
+    m_VBO->unbind();
     m_VAO->unbind();
     m_IB->unbind();
-    m_shader.unbind();
+    m_texture.unbind();
+}
+
+
+bool isMaxCoordinate(int coord, int zoom)
+{
+    return coord == zoom +
+                    COORD_COEFICIENT(zoom);
+}
+bool isMinCoordinate(int coord)
+{
+    return coord == 0;
+}
+void Tile::operator++()
+{
+    if(!isMaxCoordinate(m_position.m_x, m_position.m_zoom))
+        m_position.m_x += COORD_COEFICIENT(m_position.m_zoom - 1);
+    if(!isMaxCoordinate(m_position.m_y, m_position.m_zoom))
+        m_position.m_y += COORD_COEFICIENT(m_position.m_zoom - 1);
+    ++m_position.m_zoom;
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::operator--()
+{
+    if(m_position.m_zoom == 1)
+        return;
+
+    --m_position.m_zoom;
+    if(!isMinCoordinate(m_position.m_x))
+        m_position.m_x -= COORD_COEFICIENT(m_position.m_zoom - 1);
+    if(!isMinCoordinate(m_position.m_y))
+        m_position.m_y -= COORD_COEFICIENT(m_position.m_zoom - 1);
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::moveUp()
+{
+    if(isMinCoordinate(m_position.m_y))
+        return;
+
+    --m_position.m_y;
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::moveDown()
+{
+    if(isMaxCoordinate(m_position.m_y, m_position.m_zoom))
+        return;
+
+    ++m_position.m_y;
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::moveLeft()
+{
+    if(isMinCoordinate(m_position.m_x))
+        return;
+
+    --m_position.m_x;
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::moveRight()
+{
+    if(isMaxCoordinate(m_position.m_x, m_position.m_zoom))
+        return;
+    ++m_position.m_x;
+    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+}
+
+void Tile::showInfo()
+{
+    type(m_screenPos);
+    std:: cout << " - Z:" << m_position.m_zoom <<
+               " X:" << m_position.m_x <<
+               " Y:" << m_position.m_y << std::endl;
 }
 

@@ -17,14 +17,13 @@
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include "Tile.h"
-const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/"};
-const std::string tilesTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjVqZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
+
 const int SIZE_OF_PICTURE = 512;
 
 class Application {
 public:
     Application();
-    ~Application() = default;
+    ~Application();
 
     void initWindow();
     void start();

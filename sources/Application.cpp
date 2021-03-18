@@ -1,7 +1,7 @@
 //
 // Created by Marko on 10.03.2021.
 //
-#define COORD_INCREMENT(v) pow(2,(v-1))
+
 #include <cstdarg>
 #include <fstream>
 #include <cmath>
@@ -9,6 +9,15 @@
 #include "Renderer.h"
 
 std::vector<Tile> Application::map_level(4);
+
+Application::Application()
+{
+
+}
+Application::~Application()
+{
+
+}
 void Application::initWindow()
 {
     if (!glfwInit())
@@ -79,31 +88,27 @@ void Application::startWindowLoop()
 {
     map_level[ScreenPosition::TOP_LEFT].specRenderAttribs(ScreenPosition::TOP_LEFT);
     map_level[ScreenPosition::TOP_RIGHT].specRenderAttribs(ScreenPosition::TOP_RIGHT);
-    map_level[ScreenPosition::BOTTOM_RIGHT].specRenderAttribs(ScreenPosition::BOTTOM_RIGHT);
     map_level[ScreenPosition::BOTTOM_LEFT].specRenderAttribs(ScreenPosition::BOTTOM_LEFT);
+    map_level[ScreenPosition::BOTTOM_RIGHT].specRenderAttribs(ScreenPosition::BOTTOM_RIGHT);
 
-    int size = 512;
-    map_level[ScreenPosition::TOP_LEFT].dwnloadFromWeb(tilesWebUrl +
-    std::to_string(SIZE_OF_PICTURE), 1, 0, 0, tilesTokenUrl);
-    map_level[ScreenPosition::TOP_RIGHT].dwnloadFromWeb(tilesWebUrl +
-    std::to_string(SIZE_OF_PICTURE), 1, 1, 0, tilesTokenUrl);
-    map_level[ScreenPosition::BOTTOM_LEFT].dwnloadFromWeb(tilesWebUrl +
-    std::to_string(SIZE_OF_PICTURE), 1, 0, 1, tilesTokenUrl);
-    map_level[ScreenPosition::BOTTOM_RIGHT].dwnloadFromWeb(tilesWebUrl +
-    std::to_string(SIZE_OF_PICTURE), 1, 1, 1, tilesTokenUrl);
-    //Tile test;
-    //test.specRenderAttribs(ScreenPosition::TOP_LEFT);
+    for(auto& tile: map_level)
+    {
+
+    }
 
     while(!glfwWindowShouldClose(window))
     {
         configurePaintingSize();
         glfwPollEvents();
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
-
         for(auto&tile : map_level)
         {
-            tile.loadTileTexture();
+            tile.unbindFromDraw();
+        }
+        for(auto&tile : map_level)
+        {
             tile.bindToDraw();
+            tile.loadTileTexture();
             tile.draw();
         }
 
@@ -118,135 +123,132 @@ void Application::setKeysCallbacks()
 
 void Application::key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if(key == GLFW_KEY_KP_ADD && action == GLFW_PRESS){
-        zoomIn();
-    }
-    else if(key == GLFW_KEY_KP_SUBTRACT && action == GLFW_PRESS){
-        zoomOut();
-    }
-    /*switch (key)
-    {
-        case GLFW_KEY_KP_ADD:
-            break;
-        case GLFW_KEY_KP_SUBTRACT:
-            zoomOut();
-            break;
-        case GLFW_KEY_UP:
-            moveUp();
-            break;
-        case GLFW_KEY_DOWN:
-            moveDown();
-            break;
-        case GLFW_KEY_LEFT:
-            moveLeft();
-            break;
-        case GLFW_KEY_RIGHT:
-            moveRight();
-            break;
-        default:
-            break;
-    }*/
-}
 
-Application::Application()
-{
-
+    if(action == GLFW_PRESS)
+        switch (key)
+        {
+            case GLFW_KEY_KP_ADD:
+                zoomIn();
+                break;
+            case GLFW_KEY_KP_SUBTRACT:
+                zoomOut();
+                break;
+            case GLFW_KEY_UP:
+                moveUp();
+                break;
+            case GLFW_KEY_DOWN:
+                moveDown();
+                break;
+            case GLFW_KEY_LEFT:
+                moveLeft();
+                break;
+            case GLFW_KEY_RIGHT:
+                moveRight();
+                break;
+            default:
+                break;
+        }
 }
 
 void Application::zoomIn()
 {
+    std::cout << std::endl;
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        int z = pos.m_zoom + 1;
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                ++pos.m_zoom,
-                pos.m_x + COORD_INCREMENT(pos.m_zoom),
-                pos.m_y + COORD_INCREMENT(pos.m_zoom),tilesTokenUrl);
+        tile.unbindFromDraw();
+        ++tile;
         tile.loadTileTexture();
         tile.bindToDraw();
+        tile.showInfo();
     }
     std::cout << std::endl;
 }
 
 void Application::zoomOut()
 {
-
+    std::cout << std::endl;
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        --pos.m_zoom;
-        pos.m_x -=  pow(2, pos.m_zoom);
-        pos.m_y -=  pow(2, pos.m_zoom);
-
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                            --pos.m_zoom,
-                            pos.m_x - COORD_INCREMENT(pos.m_zoom),
-                            pos.m_y - COORD_INCREMENT(pos.m_zoom), tilesTokenUrl);
+        tile.unbindFromDraw();
+        --tile;
         tile.loadTileTexture();
         tile.bindToDraw();
+        tile.showInfo();
     }
     std::cout << std::endl;
 }
 
 void Application::moveUp()
 {
-    /*auto pos = map_level[ScreenPosition::TOP_LEFT].getPositions();
-    //replacing all fields under TOP_LEFT with fields under BOTTOM_LEFT
-    map_level[ScreenPosition::TOP_LEFT].replace(map_level[ScreenPosition::BOTTOM_LEFT]);
-    //move New value from under TOP_LEFT under key BOTTOM_LEFT
-    map_level.try_emplace(ScreenPosition::BOTTOM_LEFT, map_level[ScreenPosition::TOP_LEFT]);
-    //loading new tile for TOP_LEFT part
-    map_level[ScreenPosition::TOP_LEFT].specRenderAttribs(ScreenPosition::TOP_LEFT);
-    map_level[ScreenPosition::TOP_LEFT].dwnloadFromWeb(tilesWebUrl,pos.m_zoom,pos.m_x,pos.m_y - 1, tilesTokenUrl);
+    map_level[ScreenPosition::BOTTOM_LEFT].replace(map_level[ScreenPosition::TOP_LEFT]);
+    map_level[ScreenPosition::BOTTOM_RIGHT].replace(map_level[ScreenPosition::TOP_RIGHT]);
 
-
-    pos = map_level[ScreenPosition::TOP_RIGHT].getPositions();
-    map_level[ScreenPosition::TOP_RIGHT].replace(map_level[ScreenPosition::BOTTOM_RIGHT]);
-    map_level.try_emplace(ScreenPosition::BOTTOM_RIGHT, map_level[ScreenPosition::TOP_RIGHT]);
-
-    map_level[ScreenPosition::TOP_RIGHT].specRenderAttribs(ScreenPosition::TOP_RIGHT);
-    map_level[ScreenPosition::TOP_RIGHT].dwnloadFromWeb(tilesWebUrl,pos.m_zoom,pos.m_x,pos.m_y - 1, tilesTokenUrl);*/
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                                   pos.m_zoom,
-                                   pos.m_x,
-                                   pos.m_y + 1, tilesTokenUrl);
+        tile.unbindFromDraw();
+        if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
+                tile.getScreenPosition() == ScreenPosition::TOP_RIGHT)
+        {
+            tile.moveUp();
+            tile.loadTileTexture();
+            tile.bindToDraw();
+        }
+        tile.showInfo();
     }
+
     std::cout << std::endl;
 }
 
 void Application::moveDown()
 {
+    map_level[ScreenPosition::TOP_LEFT].replace(map_level[ScreenPosition::BOTTOM_LEFT]);
+    map_level[ScreenPosition::TOP_RIGHT].replace(map_level[ScreenPosition::BOTTOM_RIGHT]);
+
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                                   pos.m_zoom,
-                                   pos.m_x,
-                                   pos.m_y - 1, tilesTokenUrl);
+        tile.unbindFromDraw();
+        if(tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT ||
+           tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
+        {
+            tile.moveDown();
+            tile.loadTileTexture();
+            tile.bindToDraw();
+        }
+        tile.showInfo();
     }
     std::cout << std::endl;
 }
 
 void Application::moveLeft()
 {
+    map_level[ScreenPosition::TOP_RIGHT].replace(map_level[ScreenPosition::TOP_LEFT]);
+    map_level[ScreenPosition::BOTTOM_RIGHT].replace(map_level[ScreenPosition::BOTTOM_LEFT]);
+
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                                   pos.m_zoom,
-                                   pos.m_x - 1,
-                                   pos.m_y, tilesTokenUrl);
+        tile.unbindFromDraw();
+        if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
+           tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT)
+        {
+            tile.moveLeft();
+            tile.loadTileTexture();
+            tile.bindToDraw();
+        }
+        tile.showInfo();
     }
     std::cout << std::endl;
 }
 
 void Application::moveRight()
 {
+    map_level[ScreenPosition::TOP_LEFT].replace(map_level[ScreenPosition::TOP_RIGHT]);
+    map_level[ScreenPosition::BOTTOM_LEFT].replace(map_level[ScreenPosition::BOTTOM_RIGHT]);
+
     for(auto&tile : map_level){
-        auto pos = tile.getPositions();
-        tile.dwnloadFromWeb(tilesWebUrl + std::to_string(SIZE_OF_PICTURE),
-                                   pos.m_zoom,
-                                   pos.m_x + 1,
-                                   pos.m_y, tilesTokenUrl);
+        tile.unbindFromDraw();
+        if(tile.getScreenPosition() == ScreenPosition::TOP_RIGHT ||
+           tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
+        {
+            tile.moveRight();
+            tile.loadTileTexture();
+            tile.bindToDraw();
+        }
+        tile.showInfo();
     }
     std::cout << std::endl;
 }
