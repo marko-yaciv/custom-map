@@ -50,11 +50,7 @@ Tile::Tile(ScreenPosition scPosition)
 
 void Tile::dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token)
 {
-    if(!m_filePath.empty())
-    {
-        std::thread th(remove,m_filePath.data());
-        th.join();
-    }
+    remove(m_filePath.data());
 
     m_position = {coords.m_zoom, coords.m_x, coords.m_y};
     std::string spos =  "/" + std::to_string(coords.m_zoom) + "/" +

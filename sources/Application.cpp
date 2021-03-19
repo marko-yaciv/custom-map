@@ -170,7 +170,6 @@ void Application::zoomIn()
 
 void Application::zoomOut()
 {
-    std::cout << std::endl;
     for(auto&tile : map_level)
     {
         --tile;
