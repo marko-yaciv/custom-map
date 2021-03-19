@@ -6,7 +6,7 @@
 #include <fstream>
 
 #include "Application.h"
-#include <thread>
+
 std::vector<Tile> Application::map_level(4);
 
 Application::Application()
@@ -90,48 +90,9 @@ void Application::startWindowLoop()
     map_level[ScreenPosition::BOTTOM_LEFT].specRenderAttribs(ScreenPosition::BOTTOM_LEFT);
     map_level[ScreenPosition::BOTTOM_RIGHT].specRenderAttribs(ScreenPosition::BOTTOM_RIGHT);
 
-    /*std::vector<GLfloat> vertices = {
-            -1.0f, 0.0f,  0.0f, 0.0f,
-             0.0f, 0.0f,  1.0f, 0.0f,
-             0.0f, 1.0f,  1.0f, 1.0f,
-            -1.0f, 1.0f,  0.0f, 1.0f
-    };
-    std::vector<unsigned int> indices = {
-            0, 1, 2,
-            2, 3, 0
-    };
-
-    //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-    VertexArray vao;
-    VertexBuffer vbo;
-    vbo.setData(vertices.data(),vertices.size() * sizeof(GLfloat));
-
-    VertexBufferLayout layout;
-    layout.push(GL_FLOAT,2);
-    layout.push(GL_FLOAT,2);
-
-    vao.addBuffer(vbo,layout);
-
-    IndexBuffer ib(indices.data(), indices.size());
-
-    Shader shader(R"(../../res/shaders/Base.shader)");
-    shader.bind();
-
-    Texture txt;
-    txt.loadTexture(R"(../../res/textures/tree.png)");
-    txt.bind();
-
-    shader.setUniform1i("u_texture",0);
-
-    vao.unbind();
-    vbo.unbind();
-    ib.unbind();
-    shader.unbind();
-
-    Renderer renderer;*/
     for(auto&tile : map_level)
     {
+        tile.showInfo();
         tile.unbindFromDraw();
     }
 
@@ -148,12 +109,9 @@ void Application::startWindowLoop()
             tile.draw();
         }
 
-        /*shader.bind();
-        shader.setUniform1i("u_texture",0);
-        renderer.draw(vao,ib,shader);*/
-
         glfwSwapBuffers(window);
     }
+    map_level.clear();
     glfwTerminate();
 
 }
@@ -197,13 +155,13 @@ void Application::key_pressed(GLFWwindow *window, int key, int scancode, int act
 void Application::zoomIn()
 {
     std::cout << std::endl;
-    for(auto&tile : map_level){
-
-        tile.unbindFromDraw();
-        ++tile;
-        tile.loadTileTexture();
-        tile.bindToDraw();
-        tile.showInfo();
+    for(auto&tile : map_level)
+    {
+            //tile.unbindFromDraw();
+            ++tile;
+            tile.loadTileTexture();
+            //tile.bindToDraw();
+            tile.showInfo();
     }
     std::cout << std::endl;
 }
@@ -211,12 +169,13 @@ void Application::zoomIn()
 void Application::zoomOut()
 {
     std::cout << std::endl;
-    for(auto&tile : map_level){
-        tile.unbindFromDraw();
+    for(auto&tile : map_level)
+    {
+        //tile.unbindFromDraw();
         --tile;
         tile.loadTileTexture();
-        tile.bindToDraw();
         tile.showInfo();
+        //tile.bindToDraw();
     }
     std::cout << std::endl;
 }
@@ -226,7 +185,8 @@ void Application::moveUp()
     map_level[ScreenPosition::BOTTOM_LEFT].replace(map_level[ScreenPosition::TOP_LEFT]);
     map_level[ScreenPosition::BOTTOM_RIGHT].replace(map_level[ScreenPosition::TOP_RIGHT]);
 
-    for(auto&tile : map_level){
+    for(auto&tile : map_level)
+    {
 
         tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
@@ -234,8 +194,8 @@ void Application::moveUp()
         {
             tile.moveUp();
             tile.loadTileTexture();
-            tile.bindToDraw();
         }
+        tile.bindToDraw();
         tile.showInfo();
     }
 
@@ -247,15 +207,16 @@ void Application::moveDown()
     map_level[ScreenPosition::TOP_LEFT].replace(map_level[ScreenPosition::BOTTOM_LEFT]);
     map_level[ScreenPosition::TOP_RIGHT].replace(map_level[ScreenPosition::BOTTOM_RIGHT]);
 
-    for(auto&tile : map_level){
+    for(auto&tile : map_level)
+    {
         tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
         {
             tile.moveDown();
             tile.loadTileTexture();
-            tile.bindToDraw();
         }
+        tile.bindToDraw();
         tile.showInfo();
     }
     std::cout << std::endl;
@@ -266,15 +227,16 @@ void Application::moveLeft()
     map_level[ScreenPosition::TOP_RIGHT].replace(map_level[ScreenPosition::TOP_LEFT]);
     map_level[ScreenPosition::BOTTOM_RIGHT].replace(map_level[ScreenPosition::BOTTOM_LEFT]);
 
-    for(auto&tile : map_level){
+    for(auto&tile : map_level)
+    {
         tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT)
         {
             tile.moveLeft();
             tile.loadTileTexture();
-            tile.bindToDraw();
         }
+        tile.bindToDraw();
         tile.showInfo();
     }
     std::cout << std::endl;
@@ -285,15 +247,16 @@ void Application::moveRight()
     map_level[ScreenPosition::TOP_LEFT].replace(map_level[ScreenPosition::TOP_RIGHT]);
     map_level[ScreenPosition::BOTTOM_LEFT].replace(map_level[ScreenPosition::BOTTOM_RIGHT]);
 
-    for(auto&tile : map_level){
+    for(auto&tile : map_level)
+    {
         tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_RIGHT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
         {
             tile.moveRight();
             tile.loadTileTexture();
-            tile.bindToDraw();
         }
+        tile.bindToDraw();
         tile.showInfo();
     }
     std::cout << std::endl;

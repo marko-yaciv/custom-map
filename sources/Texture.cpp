@@ -23,6 +23,11 @@ Texture::~Texture()
     GLCall(glDeleteTextures(1, &m_rendererID));
 }
 
+void Texture::deleteTexture()
+{
+    GLCall(glDeleteTextures(1, &m_rendererID));
+}
+
 void Texture::bind(unsigned int slot) const
 {
     GLCall(glActiveTexture(GL_TEXTURE0 + slot))

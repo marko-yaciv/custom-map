@@ -3,14 +3,12 @@
 //
 
 #include "Tile.h"
-
-#include <chrono>
-#include <random>
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <fstream>
 #include <cmath>
+#include <thread>
 #define COORD_COEFICIENT(v) pow(2,(v))
 constexpr void type(ScreenPosition pos){
     switch(pos)
@@ -29,7 +27,6 @@ constexpr void type(ScreenPosition pos){
             break;
     }
 }
-int Tile::s_tileCounter = 0;
 
 Tile::Tile(const std::string& path, Coordinates coords, const std::string& token):
             m_position{coords}
@@ -46,10 +43,18 @@ Tile::Tile():m_webPath(""), m_position{0}{}
 
 Tile::Tile(const Tile&){}
 
-Tile::~Tile(){}
+Tile::~Tile(){
+
+}
 
 void Tile::dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token)
 {
+    if(!m_filePath.empty())
+    {
+        std::thread th(remove,m_filePath.data());
+        th.join();
+    }
+
     m_position = {coords.m_zoom, coords.m_x, coords.m_y};
     std::string spos =  "/" + std::to_string(coords.m_zoom) + "/" +
                         std::to_string(coords.m_x) + "/" +
@@ -181,6 +186,7 @@ void Tile::addVerticesToGPU()
 
 void Tile::loadTileTexture(const std::string& path)
 {
+    m_texture.deleteTexture();
     if(path.empty())
     {
         m_texture.loadTexture(m_filePath);
@@ -188,7 +194,7 @@ void Tile::loadTileTexture(const std::string& path)
     else
      {
         m_filePath = path;
-        m_texture.loadTexture(path);
+        m_texture.loadTexture(m_filePath);
      }
     m_texture.bind();
     m_shader.bind();
@@ -197,7 +203,9 @@ void Tile::loadTileTexture(const std::string& path)
 
 void Tile::bindToDraw()
 {
-
+    m_shader.bind();
+    m_VAO->bind();
+    m_IB->bind();
 }
 void Tile::draw()
 {
@@ -207,11 +215,13 @@ Tile::Coordinates Tile::getPositions() {
     return m_position;
 }
 
-void Tile::replace(const Tile& other)
+void Tile::replace(Tile& other)
 {
-    loadTileTexture(other.m_filePath);
     this->m_webPath = other.m_webPath;
     this->m_position = other.m_position;
+    loadTileTexture(other.m_filePath);
+    other.unbindFromDraw();
+    other.m_filePath = "";
 }
 
 void Tile::unbindFromDraw()
@@ -219,6 +229,7 @@ void Tile::unbindFromDraw()
     m_VBO->unbind();
     m_VAO->unbind();
     m_IB->unbind();
+    m_texture.unbind();
     m_shader.unbind();
 }
 
@@ -234,11 +245,23 @@ bool isMinCoordinate(int coord)
 }
 void Tile::operator++()
 {
-    if(!isMaxCoordinate(m_position.m_x, m_position.m_zoom))
-        m_position.m_x += COORD_COEFICIENT(m_position.m_zoom - 1);
-    if(!isMaxCoordinate(m_position.m_y, m_position.m_zoom))
-        m_position.m_y += COORD_COEFICIENT(m_position.m_zoom - 1);
     ++m_position.m_zoom;
+    if(!isMaxCoordinate(m_position.m_x, m_position.m_zoom))
+    {
+        m_position.m_x *= 2; //COORD_COEFICIENT(m_position.m_zoom - 1);
+        if(m_screenPos == TOP_LEFT || m_screenPos == BOTTOM_LEFT)
+        {
+            ++m_position.m_x;
+        }
+    }
+    if(!isMaxCoordinate(m_position.m_y, m_position.m_zoom))
+    {
+        m_position.m_y *= 2;//COORD_COEFICIENT(m_position.m_zoom - 1);
+        if(m_screenPos == TOP_LEFT || m_screenPos == TOP_RIGHT)
+        {
+            ++m_position.m_y;
+        }
+    }
     dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
 }
 
@@ -248,10 +271,25 @@ void Tile::operator--()
         return;
 
     --m_position.m_zoom;
+
     if(!isMinCoordinate(m_position.m_x))
-        m_position.m_x -= COORD_COEFICIENT(m_position.m_zoom - 1);
+    {
+        if(m_screenPos == TOP_LEFT || m_screenPos == BOTTOM_LEFT)
+        {
+            --m_position.m_x;
+        }
+        m_position.m_x /= 2; //COORD_COEFICIENT(m_position.m_zoom - 1);
+    }
+        //m_position.m_x -= COORD_COEFICIENT(m_position.m_zoom - 1);
     if(!isMinCoordinate(m_position.m_y))
-        m_position.m_y -= COORD_COEFICIENT(m_position.m_zoom - 1);
+    {
+        if(m_screenPos == TOP_LEFT || m_screenPos == TOP_RIGHT)
+        {
+            --m_position.m_y;
+        }
+        m_position.m_y /= 2;//COORD_COEFICIENT(m_position.m_zoom - 1);
+    }
+        //m_position.m_y -= COORD_COEFICIENT(m_position.m_zoom - 1);
     dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
 }
 

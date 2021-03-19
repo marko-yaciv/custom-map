@@ -13,7 +13,7 @@ public:
     Texture();
     Texture(const std::string& filepath);
     ~Texture();
-
+    void deleteTexture();
     void loadTexture(const std::string& filepath);
     void bind(unsigned int slot = 0) const;
     void unbind() const;

@@ -5,8 +5,8 @@
 #ifndef CUSTOM_MAP_PCH_H
 #define CUSTOM_MAP_PCH_H
 #include <GL/glew.h>
-
-#define ASSERT(expr) if(!(expr)) __debugbreak();
+#include <iostream>
+#define ASSERT(expr) if(!(expr)) exit(666);
 #define GLCall(glFunc) GLClearError();\
     glFunc;\
     ASSERT(GLLogCall(#glFunc, __FILE__, __LINE__))

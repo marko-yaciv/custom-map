@@ -43,7 +43,7 @@ public:
 
     void draw();
     void bindToDraw();
-    void replace(const Tile& other);
+    void replace(Tile& other);
 
     void moveUp();
     void moveDown();
@@ -74,7 +74,7 @@ private:
     std::unique_ptr<VertexArray> m_VAO;
     std::unique_ptr<VertexBuffer> m_VBO;
     std::unique_ptr<IndexBuffer> m_IB;
-    static int s_tileCounter;
+
 };
 
 
