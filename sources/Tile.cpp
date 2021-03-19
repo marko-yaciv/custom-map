@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cmath>
 #include <thread>
+#include <fileapi.h>
 #define COORD_COEFICIENT(v) pow(2,(v))
 constexpr void type(ScreenPosition pos){
     switch(pos)
@@ -96,9 +97,10 @@ void createFileNameSpecificator(std::string& file_specificator)
 
 std::string Tile::getFilename()
 {
+    CreateDirectory("tiles",nullptr);
     std::string fileDate;
     createFileNameSpecificator(fileDate);
-    std::string filename{ R"(loadedTiles\tile_)" +
+    std::string filename{ R"(tiles\tile_)" +
                          fileDate + ".png"};
     m_filePath = filename;
     return filename;
