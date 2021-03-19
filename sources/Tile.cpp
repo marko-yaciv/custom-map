@@ -8,7 +8,6 @@
 #include <curlpp/Options.hpp>
 #include <fstream>
 #include <cmath>
-#include <fileapi.h>
 #define COORD_COEFICIENT(v) pow(2,(v))
 constexpr void type(ScreenPosition pos){
     switch(pos)
@@ -94,7 +93,7 @@ std::string Tile::getFilename()
 {
     std::string fileDate;
     createFileNameSpecificator(fileDate);
-    std::string filename{ R"(tiles\tile_)" +
+    std::string filename{TILES_DIR + R"(\tile_)" +
                          fileDate + ".png"};
     m_filePath = filename;
     return filename;
@@ -118,7 +117,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     -1.0f, 1.0f,  0.0f, 1.0f
 
             };
-            dwnloadFromWeb(tilesWebUrl,{1,0,0},tilesWebTokenUrl);
+            dwnloadFromWeb(TILE_WEB_URL, {1, 0, 0}, TILE_WEB_TOKEN);
             break;
         case ScreenPosition::TOP_RIGHT:
             m_vertices = {
@@ -128,7 +127,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     0.0f, 1.0f,  0.0f, 1.0f
 
             };
-            dwnloadFromWeb(tilesWebUrl,{1,1,0},tilesWebTokenUrl);
+            dwnloadFromWeb(TILE_WEB_URL, {1, 1, 0}, TILE_WEB_TOKEN);
             break;
         case ScreenPosition::BOTTOM_LEFT:
             m_vertices = {
@@ -137,7 +136,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                      0.0f,  0.0f,  1.0f, 1.0f,
                     -1.0f,  0.0f,  0.0f, 1.0f
             };
-            dwnloadFromWeb(tilesWebUrl,{1,0,1},tilesWebTokenUrl);
+            dwnloadFromWeb(TILE_WEB_URL, {1, 0, 1}, TILE_WEB_TOKEN);
             break;
         case ScreenPosition::BOTTOM_RIGHT:
             m_vertices = {
@@ -146,7 +145,7 @@ void Tile::specRenderAttribs(ScreenPosition scPosition)
                     1.0f,  0.0f,  1.0f, 1.0f,
                     0.0f,  0.0f,  0.0f, 1.0f
             };
-            dwnloadFromWeb(tilesWebUrl,{1,1,1},tilesWebTokenUrl);
+            dwnloadFromWeb(TILE_WEB_URL, {1, 1, 1}, TILE_WEB_TOKEN);
             break;
         default:
             m_vertices = {
@@ -252,7 +251,7 @@ void Tile::operator++()
             ++m_position.m_y;
         }
     }
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::operator--()
@@ -280,7 +279,7 @@ void Tile::operator--()
         m_position.m_y /= 2;
     }
 
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::moveUp()
@@ -289,7 +288,7 @@ void Tile::moveUp()
         return;
 
     --m_position.m_y;
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::moveDown()
@@ -298,7 +297,7 @@ void Tile::moveDown()
         return;
 
     ++m_position.m_y;
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::moveLeft()
@@ -307,7 +306,7 @@ void Tile::moveLeft()
         return;
 
     --m_position.m_x;
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::moveRight()
@@ -315,7 +314,7 @@ void Tile::moveRight()
     if(isMaxCoordinate(m_position.m_x, m_position.m_zoom))
         return;
     ++m_position.m_x;
-    dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
+    dwnloadFromWeb(TILE_WEB_URL, m_position, TILE_WEB_TOKEN);
 }
 
 void Tile::showInfo()

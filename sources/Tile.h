@@ -15,9 +15,11 @@
 #include "Renderer.h"
 #include "Texture.h"
 
+/*name of directory to stole loaded tiles*/
+const std::string TILES_DIR{"tiles"};
 /*Constants to store url of the map*/
-const std::string tilesWebUrl{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512"};
-const std::string tilesWebTokenUrl{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjV"
+const std::string TILE_WEB_URL{"https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512"};
+const std::string TILE_WEB_TOKEN{"?access_token=pk.eyJ1IjoibWFya28teWFjaXYiLCJhIjoiY2ttYnV3azA0MjV"
                                    "qZTJvbnh6OHdycXVlMSJ9.cnr7gV6c1DqVMpkpBmNaDQ"};
 
 /*Keeps position of tile on the screen*/

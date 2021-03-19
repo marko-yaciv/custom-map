@@ -4,13 +4,15 @@
 #include <fstream>
 #include "Application.h"
 #include <fileapi.h>
-#include <direct.h>
+const int WINDOW_HEIGHT = 800;
+const int WINDOW_WIDTH = 800;
+const std::string WINDOW_TITLE{"Custom map"};
 
 std::vector<Tile> Application::map_level(4);
 
 Application::Application()
 {
-    CreateDirectory("tiles", nullptr);
+    CreateDirectory(TILES_DIR.c_str(), nullptr);
 }
 
 Application::~Application(){}
@@ -35,7 +37,8 @@ void Application::createWindow()
 {
     /* Create a windowed mode
      * window and its OpenGL context */
-    window = glfwCreateWindow(800, 800, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT,
+            WINDOW_TITLE.c_str(), NULL, NULL);
     if (!window)
     {
         glfwTerminate();
