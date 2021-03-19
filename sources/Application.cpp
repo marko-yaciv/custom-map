@@ -3,10 +3,15 @@
 //
 #include <fstream>
 #include "Application.h"
+#include <fileapi.h>
+#include <direct.h>
 
 std::vector<Tile> Application::map_level(4);
 
-Application::Application(){}
+Application::Application()
+{
+    CreateDirectory("tiles", nullptr);
+}
 
 Application::~Application(){}
 
@@ -63,6 +68,7 @@ void Application::start()
 {
     try
     {
+
         createWindow();
         std::cout << glGetString(GL_VERSION) << std::endl;
 
