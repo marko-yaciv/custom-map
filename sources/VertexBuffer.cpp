@@ -35,5 +35,6 @@ void VertexBuffer::setData(const void *data, unsigned int size)
 {
     GLCall(glGenBuffers(1, &m_redererID));
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_redererID));
+    /*Specify the buffer of attribs to be drawn by GPU*/
     GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }

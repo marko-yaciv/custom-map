@@ -1,22 +1,15 @@
 //
 // Created by Marko on 10.03.2021.
 //
-
-#include <cstdarg>
 #include <fstream>
-
 #include "Application.h"
 
 std::vector<Tile> Application::map_level(4);
 
-Application::Application()
-{
+Application::Application(){}
 
-}
-Application::~Application()
-{
+Application::~Application(){}
 
-}
 void Application::initWindow()
 {
     if (!glfwInit())
@@ -29,14 +22,15 @@ void Application::initWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     //setting profile for context
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //cannot scale window
+    //can scale window
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 }
 void Application::createWindow()
 {
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 640, "Hello World", NULL, NULL);
+    /* Create a windowed mode
+     * window and its OpenGL context */
+    window = glfwCreateWindow(800, 800, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -85,6 +79,8 @@ void Application::start()
 
 void Application::startWindowLoop()
 {
+    /*Configure four tiles and set
+     * the initial position on the screen*/
     map_level[ScreenPosition::TOP_LEFT].specRenderAttribs(ScreenPosition::TOP_LEFT);
     map_level[ScreenPosition::TOP_RIGHT].specRenderAttribs(ScreenPosition::TOP_RIGHT);
     map_level[ScreenPosition::BOTTOM_LEFT].specRenderAttribs(ScreenPosition::BOTTOM_LEFT);
@@ -92,17 +88,24 @@ void Application::startWindowLoop()
 
     for(auto&tile : map_level)
     {
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
+#endif
         tile.unbindFromDraw();
     }
-
+#ifdef SHOW_DEBUG_INFO
+    std::cout << std::endl;
+#endif
     while(!glfwWindowShouldClose(window))
     {
+        /*Check for window size and if it's changed,
+         * reset new size of paining field*/
         configurePaintingSize();
+        /*Check for pressed keys*/
         glfwPollEvents();
-
+        /*calls glClear*/
         Renderer::clear();
-
+        /*loop to refresh each tile*/
         for(auto&tile : map_level)
         {
             tile.loadTileTexture();
@@ -112,8 +115,6 @@ void Application::startWindowLoop()
         glfwSwapBuffers(window);
     }
     map_level.clear();
-    glfwTerminate();
-
 }
 
 void Application::setKeysCallbacks()
@@ -154,16 +155,17 @@ void Application::key_pressed(GLFWwindow *window, int key, int scancode, int act
 
 void Application::zoomIn()
 {
-    std::cout << std::endl;
     for(auto&tile : map_level)
     {
-            //tile.unbindFromDraw();
             ++tile;
             tile.loadTileTexture();
-            //tile.bindToDraw();
+#ifdef SHOW_DEBUG_INFO
             tile.showInfo();
+#endif
     }
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }
 
 void Application::zoomOut()
@@ -171,13 +173,15 @@ void Application::zoomOut()
     std::cout << std::endl;
     for(auto&tile : map_level)
     {
-        //tile.unbindFromDraw();
         --tile;
         tile.loadTileTexture();
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
-        //tile.bindToDraw();
+#endif
     }
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }
 
 void Application::moveUp()
@@ -188,18 +192,19 @@ void Application::moveUp()
     for(auto&tile : map_level)
     {
 
-        tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
                 tile.getScreenPosition() == ScreenPosition::TOP_RIGHT)
         {
             tile.moveUp();
             tile.loadTileTexture();
         }
-        tile.bindToDraw();
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
+#endif
     }
-
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }
 
 void Application::moveDown()
@@ -209,17 +214,20 @@ void Application::moveDown()
 
     for(auto&tile : map_level)
     {
-        tile.unbindFromDraw();
+
         if(tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
         {
             tile.moveDown();
             tile.loadTileTexture();
         }
-        tile.bindToDraw();
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
+#endif
     }
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }
 
 void Application::moveLeft()
@@ -229,17 +237,19 @@ void Application::moveLeft()
 
     for(auto&tile : map_level)
     {
-        tile.unbindFromDraw();
         if(tile.getScreenPosition() == ScreenPosition::TOP_LEFT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_LEFT)
         {
             tile.moveLeft();
             tile.loadTileTexture();
         }
-        tile.bindToDraw();
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
+#endif
     }
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }
 
 void Application::moveRight()
@@ -249,15 +259,18 @@ void Application::moveRight()
 
     for(auto&tile : map_level)
     {
-        tile.unbindFromDraw();
+
         if(tile.getScreenPosition() == ScreenPosition::TOP_RIGHT ||
            tile.getScreenPosition() == ScreenPosition::BOTTOM_RIGHT)
         {
             tile.moveRight();
             tile.loadTileTexture();
         }
-        tile.bindToDraw();
+#ifdef SHOW_DEBUG_INFO
         tile.showInfo();
+#endif
     }
+#ifdef SHOW_DEBUG_INFO
     std::cout << std::endl;
+#endif
 }

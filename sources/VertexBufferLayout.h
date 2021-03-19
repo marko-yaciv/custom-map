@@ -8,6 +8,9 @@
 #include "utils/pch.h"
 #include <vector>
 
+/*Element of layout. Has it's type.
+ * count (depends on .. of VBO (2D, 3D or 4D))
+ * if this element should be normalised*/
 struct VertexBufferElement{
     unsigned int type;
     unsigned int count;
@@ -27,7 +30,8 @@ struct VertexBufferElement{
     }
 };
 
-
+/*Representss VBO layout that keeps vector of
+ * Elements and allows to add new element to layout*/
 class VertexBufferLayout{
 public:
     VertexBufferLayout()
@@ -37,6 +41,7 @@ public:
     inline unsigned int getStride() const {return m_stride;}
 private:
     std::vector<VertexBufferElement> m_elements;
+    /*stride in bytes between elements*/
     unsigned int m_stride;
 };
 

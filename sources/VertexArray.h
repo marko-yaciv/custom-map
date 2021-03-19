@@ -9,6 +9,8 @@
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 
+/*Reresents standard Vertex Array Object (VAO)
+ * to store VBOs with given layouts for them*/
 class VertexBufferLayout;
 class VertexArray {
 public:

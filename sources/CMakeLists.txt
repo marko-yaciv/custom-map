@@ -23,7 +23,7 @@ set(RENDER_API_SRC
         utils/pch.h)
 set(APPLICATION_SRC
         Application.cpp Application.h
-        main.cpp Tile.cpp Tile.h)
+        main.cpp Tile.cpp Tile.h utils/pch.cpp)
 add_executable(${CMAKE_PROJECT_NAME} ${APPLICATION_SRC} ${RENDER_API_SRC})
 
 target_link_libraries(${CMAKE_PROJECT_NAME}

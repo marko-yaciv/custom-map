@@ -18,8 +18,8 @@
 #include <curlpp/Options.hpp>
 #include "Tile.h"
 
-const int SIZE_OF_PICTURE = 512;
-
+/*Application class that rules game loop
+ * and keyboard shortcuts for navigating map*/
 class Application {
 public:
     Application();
@@ -32,6 +32,8 @@ private:
     void configurePaintingSize();
     void startWindowLoop();
 
+    /*Functions that will be called from
+     * key_pressed callback function judging from pressed key*/
     static void zoomIn();
     static void zoomOut();
     static void moveUp();
@@ -41,10 +43,11 @@ private:
 
     //button events
     void setKeysCallbacks();
-
     static void key_pressed(GLFWwindow* window, int key, int scancode, int action, int mods);
 private:
     GLFWwindow * window;
+    /*vector of four tiles that will be
+     * represented on the screen in one time*/
     static std::vector<Tile> map_level;
 };
 

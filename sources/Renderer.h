@@ -10,7 +10,9 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 
-
+/*Renderer class that used to wrap the
+ * binding of needed data for rendering, and drawing it.
+ * Also calls glClear*/
 class Renderer{
 public:
     void draw(const VertexArray& vao, const IndexBuffer& ib, Shader& shader) const ;

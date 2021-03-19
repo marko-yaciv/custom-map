@@ -28,6 +28,12 @@ constexpr void type(ScreenPosition pos){
     }
 }
 
+Tile::Tile():m_webPath(""), m_position{0}{}
+
+Tile::Tile(const Tile&){}
+
+Tile::~Tile(){}
+
 Tile::Tile(const std::string& path, Coordinates coords, const std::string& token):
             m_position{coords}
 {
@@ -39,13 +45,7 @@ Tile::Tile(ScreenPosition scPosition)
     specRenderAttribs(scPosition);
 }
 
-Tile::Tile():m_webPath(""), m_position{0}{}
 
-Tile::Tile(const Tile&){}
-
-Tile::~Tile(){
-
-}
 
 void Tile::dwnloadFromWeb(const std::string& path, Coordinates coords, const std::string& token)
 {
@@ -201,12 +201,6 @@ void Tile::loadTileTexture(const std::string& path)
     m_shader.setUniform1i("u_texture",0);
 }
 
-void Tile::bindToDraw()
-{
-    m_shader.bind();
-    m_VAO->bind();
-    m_IB->bind();
-}
 void Tile::draw()
 {
     m_renderer.draw(*m_VAO,*m_IB,m_shader);
@@ -248,7 +242,7 @@ void Tile::operator++()
     ++m_position.m_zoom;
     if(!isMaxCoordinate(m_position.m_x, m_position.m_zoom))
     {
-        m_position.m_x *= 2; //COORD_COEFICIENT(m_position.m_zoom - 1);
+        m_position.m_x *= 2;
         if(m_screenPos == TOP_LEFT || m_screenPos == BOTTOM_LEFT)
         {
             ++m_position.m_x;
@@ -256,7 +250,7 @@ void Tile::operator++()
     }
     if(!isMaxCoordinate(m_position.m_y, m_position.m_zoom))
     {
-        m_position.m_y *= 2;//COORD_COEFICIENT(m_position.m_zoom - 1);
+        m_position.m_y *= 2;
         if(m_screenPos == TOP_LEFT || m_screenPos == TOP_RIGHT)
         {
             ++m_position.m_y;
@@ -278,18 +272,18 @@ void Tile::operator--()
         {
             --m_position.m_x;
         }
-        m_position.m_x /= 2; //COORD_COEFICIENT(m_position.m_zoom - 1);
+        m_position.m_x /= 2;
     }
-        //m_position.m_x -= COORD_COEFICIENT(m_position.m_zoom - 1);
+
     if(!isMinCoordinate(m_position.m_y))
     {
         if(m_screenPos == TOP_LEFT || m_screenPos == TOP_RIGHT)
         {
             --m_position.m_y;
         }
-        m_position.m_y /= 2;//COORD_COEFICIENT(m_position.m_zoom - 1);
+        m_position.m_y /= 2;
     }
-        //m_position.m_y -= COORD_COEFICIENT(m_position.m_zoom - 1);
+
     dwnloadFromWeb(tilesWebUrl, m_position, tilesWebTokenUrl);
 }
 

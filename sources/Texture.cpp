@@ -53,15 +53,18 @@ void Texture::do_loadTexture()
     GLCall(glGenTextures(1,&m_rendererID));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));
 
+    /*Set scaling policy for the texture*/
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+    /*Load texture to GPU memory*/
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_localBuffer));
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 
+    /*release texture from th CPU memory*/
     if(m_localBuffer)
     {
         stbi_image_free(m_localBuffer);

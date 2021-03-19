@@ -29,6 +29,8 @@ void VertexArray::addBuffer(const VertexBuffer &vb,
     vb.bind();
     unsigned int offset = 0;
     const auto& elements = layout.getElements();
+    /*Tell array pointer how to find
+     * each characteristic (element) of layout in VBO*/
     for (int i = 0; i < elements.size(); ++i)
     {
         const auto& element = elements[i];
